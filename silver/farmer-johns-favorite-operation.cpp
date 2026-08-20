@@ -17,6 +17,20 @@ using i64 = long long;
 using u32 = unsigned;
 using u64 = unsigned long long;
 
+/**
+    a = [a_1, a_2, ..., a_N] 
+    We extend the array after index N by setting a_i = a_{i - N} + M, for i > N
+    This ensures we keep the loop property of the modulo-circle and also the fact
+    we can visit all N windows.
+
+    To optimize time, we can keep a prefix sum of the array and after we find we median
+    we can find LHS and RHS sums in O(1) time complexity.
+
+    a_1 a_2 (a_3) a_4 a_5
+    (a_3 - a_1) + (a_3 - a_2) + (a_4 - a_3) + (a_5 - a_3) = (a_4 + a_5) - (a_1 + a_2) = RHS - LHS
+    I.e. median doesn't matter, just the sums on the left and right!
+ */
+
 void solve() {
     int N, M;
     cin >> N >> M;
@@ -26,12 +40,12 @@ void solve() {
         cin >> a[i];
         a[i] %= M;
     }
-    sort(a.begin(), a.begin() + N + 1);
+    sort(a.begin() + 1, a.begin() + N + 1);
 
     for (int i = N + 1; i <= 2 * N; i++) {
-        a[i] = a[i - N] + M;    
+        a[i] = a[i - N] + M;
     }
-    
+
     vector<i64> pref(2 * N + 1, 0LL);
     for (int i = 1; i <= 2 * N; i++) {
         pref[i] = pref[i - 1] + a[i];
